@@ -1,0 +1,1 @@
+export default function VerQR() { return <div>Ver QR</div> }

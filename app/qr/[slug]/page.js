@@ -1,0 +1,1 @@
+export default function ObraPublica() { return <div>Obra publica</div> }

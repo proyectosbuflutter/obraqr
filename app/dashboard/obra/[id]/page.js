@@ -1,0 +1,1 @@
+export default function DetalleObra() { return <div>Detalle obra</div> }
