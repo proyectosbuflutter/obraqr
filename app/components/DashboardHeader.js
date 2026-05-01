@@ -91,7 +91,7 @@ export default function DashboardHeader({ accionDerecha }) {
     <>
       {modalAbierto && <ModalCuenta onClose={() => setModalAbierto(false)} />}
       <header className="fixed top-0 left-0 right-0 h-[72px] bg-[#0f3d52] flex items-center justify-between px-8 z-50">
-        <Link href="/dashboard">
+        <Link href="/">
           <img src="/obraqr.png" alt="ObraQR" className="h-12 w-auto" />
         </Link>
         <nav className="flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
