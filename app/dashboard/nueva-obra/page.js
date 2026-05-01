@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase'
+import { useAuth } from '@/app/context/AuthContext'
 import { useRouter } from 'next/navigation'
 
 function generarSlug(nombre) {
@@ -14,6 +14,7 @@ function generarSlug(nombre) {
 }
 
 export default function NuevaObra() {
+  const { user, supabase } = useAuth()
   const router = useRouter()
   const [nombre, setNombre] = useState('')
   const [direccion, setDireccion] = useState('')
@@ -26,10 +27,6 @@ export default function NuevaObra() {
     e.preventDefault()
     setLoading(true)
     setError('')
-
-    const supabase = createClient()
-    const { data: { session } } = await supabase.auth.getSession()
-const user = session?.user
 
     if (!user) {
       router.push('/login')
