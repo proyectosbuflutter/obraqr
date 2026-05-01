@@ -12,6 +12,7 @@ export default function DetalleObra() {
   const [obra, setObra] = useState(null)
   const [updates, setUpdates] = useState([])
   const [loading, setLoading] = useState(true)
+  const [popupImg, setPopupImg] = useState(null)
 
   useEffect(() => {
     if (!user) return
@@ -36,8 +37,15 @@ export default function DetalleObra() {
   )
   if (!obra) return null
 
+  const Popup = popupImg && (
+    <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4" onClick={() => setPopupImg(null)}>
+      <img src={popupImg} alt="" className="max-w-full max-h-full rounded-xl object-contain" />
+    </div>
+  )
+
   return (
     <div className="min-h-screen bg-[#F5B800]">
+      {Popup}
       {/* HEADER */}
       <header className="fixed top-0 left-0 right-0 h-[72px] bg-[#0f3d52] flex items-center justify-between px-8 z-50">
         <Link href="/dashboard">
@@ -102,15 +110,23 @@ export default function DetalleObra() {
           <div className="flex flex-col gap-4">
             {updates.map(update => (
               <div key={update.id} className="bg-white rounded-2xl p-6 border border-[#e8e8e8]">
-                <p className="text-xs text-[#555] mb-2 font-semibold">{new Date(update.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                <p className="text-[#0f3d52] font-medium mb-4">{update.texto}</p>
-                {update.update_images?.length > 0 && (
-                  <div className="flex gap-3 flex-wrap">
-                    {update.update_images.map(img => (
-                      <img key={img.id} src={img.storage_url} alt="" className="w-32 h-32 object-cover rounded-xl" />
-                    ))}
-                  </div>
-                )}
+                <p className="text-xs text-[#555] mb-3 font-semibold">{new Date(update.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                <div className="flex gap-4 items-start">
+                  {update.update_images?.length > 0 && (
+                    <div className="flex gap-2 flex-shrink-0">
+                      {update.update_images.map(img => (
+                        <img
+                          key={img.id}
+                          src={img.storage_url}
+                          alt=""
+                          className="w-28 h-28 object-cover rounded-xl cursor-pointer hover:opacity-90 transition-opacity"
+                          onClick={() => setPopupImg(img.storage_url)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-[#0f3d52] font-medium">{update.texto}</p>
+                </div>
               </div>
             ))}
           </div>
