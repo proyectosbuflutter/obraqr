@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import ImagenPopup from '@/app/components/ImagenPopup'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -177,11 +178,7 @@ export default async function ObraPublica({ params }) {
               </p>
               <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
                 {update.update_images?.length > 0 && (
-                  <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
-                    {update.update_images.map(img => (
-                      <img key={img.id} src={img.storage_url} alt="" style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '10px' }} />
-                    ))}
-                  </div>
+                  <ImagenPopup imagenes={update.update_images} />
                 )}
                 <p style={{ color: '#0f3d52', fontWeight: 500, lineHeight: 1.6, fontSize: '0.95rem' }}>{update.texto}</p>
               </div>
