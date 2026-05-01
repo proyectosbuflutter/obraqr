@@ -49,7 +49,7 @@ export default async function ObraPublica({ params }) {
       <header style={{ background: '#0f3d52', padding: '0 32px', height: '72px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
         <a href="/"><img src="https://obraqr.vercel.app/obraqr.png" alt="ObraQR" style={{ height: '48px', width: 'auto' }} /></a>
         <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Diario de obra digital</span>
-        <button onClick={() => window.close()} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.6)', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>✕ Cerrar</button>
+        <a href="javascript:window.close()" style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'rgba(255,255,255,0.6)', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none' }}>✕ Cerrar</a>
       </header>
 
       <main style={{ padding: '32px 24px', maxWidth: '720px', margin: '0 auto' }}>
