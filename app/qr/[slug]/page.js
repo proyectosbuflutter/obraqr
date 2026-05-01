@@ -32,7 +32,15 @@ export default async function ObraPublica({ params }) {
   const { data: updates } = await supabase
     .from('updates').select('*, update_images(*)').eq('obra_id', obra.id).order('created_at', { ascending: false })
 
+  const { data: fases } = await supabase
+    .from('fases_obra').select('*').eq('obra_id', obra.id).order('orden')
+
+  const todasLasImagenes = updates?.flatMap(u => u.update_images || []) || []
   const estado = estadoConfig[obra.estado] || estadoConfig.en_curso
+
+  const diasTranscurridos = obra.fecha_inicio
+    ? Math.floor((new Date() - new Date(obra.fecha_inicio)) / (1000 * 60 * 60 * 24))
+    : null
 
   return (
     <div style={{ minHeight: '100vh', background: '#F5B800', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
@@ -47,7 +55,7 @@ export default async function ObraPublica({ params }) {
 
         {/* INFO OBRA */}
         <div style={{ background: '#0f3d52', borderRadius: '20px', padding: '28px', marginBottom: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '20px' }}>
             <div>
               <h1 style={{ color: 'white', fontWeight: 900, fontSize: '1.6rem', marginBottom: '6px', lineHeight: 1.2 }}>{obra.nombre}</h1>
               <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.9rem', marginBottom: '4px' }}>{obra.direccion}</p>
@@ -56,15 +64,101 @@ export default async function ObraPublica({ params }) {
                   Inicio: {new Date(obra.fecha_inicio).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </p>
               )}
+              {obra.fecha_fin_estimada && (
+                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', marginTop: '2px' }}>
+                  Fin estimado: {new Date(obra.fecha_fin_estimada).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </p>
+              )}
             </div>
             <span style={{ background: `${estado.color}22`, color: estado.color, padding: '6px 14px', borderRadius: '99px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0 }}>
               {estado.label}
             </span>
           </div>
+
+          {/* STATS */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: obra.porcentaje_avance > 0 ? '20px' : '0' }}>
+            {diasTranscurridos !== null && (
+              <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '12px', textAlign: 'center' }}>
+                <p style={{ color: 'white', fontWeight: 900, fontSize: '1.6rem', lineHeight: 1 }}>{diasTranscurridos}</p>
+                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem', marginTop: '4px' }}>días en obra</p>
+              </div>
+            )}
+            <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '12px', textAlign: 'center' }}>
+              <p style={{ color: 'white', fontWeight: 900, fontSize: '1.6rem', lineHeight: 1 }}>{updates?.length || 0}</p>
+              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem', marginTop: '4px' }}>actualizaciones</p>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '12px', textAlign: 'center' }}>
+              <p style={{ color: 'white', fontWeight: 900, fontSize: '1.6rem', lineHeight: 1 }}>{todasLasImagenes.length}</p>
+              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem', marginTop: '4px' }}>fotos</p>
+            </div>
+          </div>
+
+          {/* BARRA DE PROGRESO */}
+          {obra.porcentaje_avance > 0 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.75rem', fontWeight: 600 }}>Progreso de la obra</p>
+                <p style={{ color: 'white', fontSize: '0.75rem', fontWeight: 900 }}>{obra.porcentaje_avance}%</p>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: '99px', height: '8px', overflow: 'hidden' }}>
+                <div style={{ background: '#4CAF50', height: '100%', width: `${obra.porcentaje_avance}%`, borderRadius: '99px', transition: 'width 0.5s' }} />
+              </div>
+            </div>
+          )}
         </div>
 
+        {/* CONTACTO */}
+        {(obra.telefono_constructor || obra.whatsapp_constructor) && (
+          <div style={{ background: 'white', borderRadius: '16px', padding: '20px', marginBottom: '24px', display: 'flex', gap: '12px' }}>
+            {obra.telefono_constructor && (
+              <a href={`tel:${obra.telefono_constructor}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', background: '#0f3d52', borderRadius: '12px', color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.85rem' }}>
+                📞 Llamar
+              </a>
+            )}
+            {obra.whatsapp_constructor && (
+              <a href={`https://wa.me/${obra.whatsapp_constructor.replace(/\D/g, '')}`} target="_blank" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', background: '#25D366', borderRadius: '12px', color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.85rem' }}>
+                💬 WhatsApp
+              </a>
+            )}
+          </div>
+        )}
+
+        {/* FASES */}
+        {fases && fases.length > 0 && (
+          <div style={{ background: 'white', borderRadius: '16px', padding: '20px', marginBottom: '24px' }}>
+            <h2 style={{ color: '#0f3d52', fontWeight: 900, fontSize: '1rem', marginBottom: '16px' }}>Fases de la obra</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {fases.map(fase => {
+                const completada = fase.estado === 'completada'
+                const enCurso = fase.estado === 'en_curso'
+                return (
+                  <div key={fase.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', background: completada ? '#f0faf0' : enCurso ? '#fff8e1' : '#f5f5f5', borderRadius: '10px' }}>
+                    <span style={{ fontSize: '1rem' }}>{completada ? '✅' : enCurso ? '🔄' : '⏳'}</span>
+                    <span style={{ color: '#0f3d52', fontWeight: 600, fontSize: '0.9rem', flex: 1 }}>{fase.nombre}</span>
+                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: completada ? '#388e3c' : enCurso ? '#f57c00' : '#999', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      {completada ? 'Completada' : enCurso ? 'En curso' : 'Pendiente'}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* GALERIA */}
+        {todasLasImagenes.length > 0 && (
+          <div style={{ background: 'white', borderRadius: '16px', padding: '20px', marginBottom: '24px' }}>
+            <h2 style={{ color: '#0f3d52', fontWeight: 900, fontSize: '1rem', marginBottom: '16px' }}>Galería de fotos ({todasLasImagenes.length})</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+              {todasLasImagenes.map(img => (
+                <img key={img.id} src={img.storage_url} alt="" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: '10px' }} />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* TIMELINE */}
-        <h2 style={{ color: '#0f3d52', fontWeight: 900, fontSize: '1.1rem', marginBottom: '16px', letterSpacing: '-0.3px' }}>
+        <h2 style={{ color: '#0f3d52', fontWeight: 900, fontSize: '1.1rem', marginBottom: '16px' }}>
           Actualizaciones {updates?.length > 0 && <span style={{ color: '#555', fontWeight: 400, fontSize: '0.9rem' }}>({updates.length})</span>}
         </h2>
 
@@ -94,7 +188,6 @@ export default async function ObraPublica({ params }) {
           ))}
         </div>
 
-        {/* FOOTER */}
         <div style={{ textAlign: 'center', padding: '40px 0 20px', color: 'rgba(0,0,0,0.3)', fontSize: '0.75rem' }}>
           Powered by <strong style={{ color: '#0f3d52' }}>ObraQR</strong>
         </div>
