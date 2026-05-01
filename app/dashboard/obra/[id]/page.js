@@ -60,7 +60,7 @@ export default function DetalleObra() {
       <div>
         <Link href={`/dashboard/obra/${id}/nueva-actualizacion`}>+ Nueva actualización</Link>
         <Link href={`/dashboard/qr/${id}`}>Ver QR</Link>
-        <a href={`/qr/${obra.slug}`} target="_blank">Ver página cliente</a>
+        <a href={`https://obraqr.vercel.app/qr/${obra.slug}`} target="_blank">Ver página cliente</a>
       </div>
 
       <h2>Actualizaciones</h2>
