@@ -151,11 +151,7 @@ export default async function ObraPublica({ params }) {
         {todasLasImagenes.length > 0 && (
           <div style={{ background: 'white', borderRadius: '16px', padding: '20px', marginBottom: '24px' }}>
             <h2 style={{ color: '#0f3d52', fontWeight: 900, fontSize: '1rem', marginBottom: '16px' }}>Galería de fotos ({todasLasImagenes.length})</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-              {todasLasImagenes.map(img => (
-                <img key={img.id} src={img.storage_url} alt="" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: '10px' }} />
-              ))}
-            </div>
+            <ImagenPopup imagenes={todasLasImagenes} esGaleria={true} />
           </div>
         )}
 
