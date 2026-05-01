@@ -20,6 +20,7 @@ export default function NuevaObra() {
   const [direccion, setDireccion] = useState('')
   const [descripcion, setDescripcion] = useState('')
   const [fechaInicio, setFechaInicio] = useState('')
+  const [clienteNombre, setClienteNombre] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -48,7 +49,8 @@ export default function NuevaObra() {
         descripcion,
         slug,
         estado: 'en_curso',
-        fecha_inicio: fechaInicio || null
+        fecha_inicio: fechaInicio || null,
+        cliente_nombre: clienteNombre || null
       })
       .select()
       .single()
@@ -84,6 +86,12 @@ export default function NuevaObra() {
           placeholder="Descripción (opcional)"
           value={descripcion}
           onChange={e => setDescripcion(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Nombre del cliente"
+          value={clienteNombre}
+          onChange={e => setClienteNombre(e.target.value)}
         />
         <label>Fecha de inicio</label>
         <input
