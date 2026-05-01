@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useAuth } from '@/app/context/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import DashboardHeader from '@/app/components/DashboardHeader'
 
 function generarSlug(nombre) {
   return nombre
@@ -47,16 +48,7 @@ export default function NuevaObra() {
   return (
     <div className="min-h-screen bg-[#F5B800]">
       {/* HEADER */}
-      <header className="fixed top-0 left-0 right-0 h-[72px] bg-[#0f3d52] flex items-center justify-between px-8 z-50">
-        <Link href="/dashboard">
-          <img src="/obraqr.png" alt="ObraQR" className="h-12 w-auto" />
-        </Link>
-        <nav className="flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-          <Link href="/dashboard" className="text-white/60 text-xs font-semibold uppercase tracking-widest hover:text-[#F5B800] transition-colors">Mis obras</Link>
-          <Link href="/dashboard/clientes" className="text-white/60 text-xs font-semibold uppercase tracking-widest hover:text-[#F5B800] transition-colors">Clientes</Link>
-          <Link href="/dashboard/cuenta" className="text-white/60 text-xs font-semibold uppercase tracking-widest hover:text-[#F5B800] transition-colors">Cuenta</Link>
-        </nav>
-      </header>
+      <DashboardHeader />
 
       {/* MAIN */}
       <main className="pt-[72px] p-8">
