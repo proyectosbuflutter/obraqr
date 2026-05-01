@@ -60,7 +60,7 @@ export default function Dashboard() {
   const enCurso = obras.filter(o => o.estado === 'en_curso').length
   const terminadas = obras.filter(o => o.estado === 'terminada').length
 
-  if (loading || !perfil) return (
+  if (loading) return (
     <div className="min-h-screen bg-[#F5B800] flex items-center justify-center">
       <p className="text-[#0f3d52] font-bold">Cargando...</p>
     </div>
