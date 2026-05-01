@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/app/context/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -15,12 +15,12 @@ function ModalCuenta({ onClose }) {
   const [mensaje, setMensaje] = useState('')
   const [loading, setLoading] = useState(false)
 
-  useState(() => {
+  useEffect(() => {
     if (!user) return
     supabase.from('users').select('*').eq('id', user.id).single().then(({ data }) => {
       if (data) { setPerfil(data); setNombre(data.nombre || ''); setEmpresa(data.empresa || '') }
     })
-  })
+  }, [user])
 
   async function handleGuardar() {
     setLoading(true)
@@ -44,41 +44,22 @@ function ModalCuenta({ onClose }) {
           <h2 className="font-black text-xl text-[#0f3d52]">Mi cuenta</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
         </div>
-
         <div className="flex flex-col gap-4">
           <div className="bg-[#f5f0e8] rounded-xl p-4">
             <p className="text-xs text-[#555] font-semibold uppercase tracking-wide mb-1">Email</p>
             <p className="text-[#0f3d52] font-medium">{user?.email}</p>
           </div>
-
           <div className="bg-[#f5f0e8] rounded-xl p-4">
             <p className="text-xs text-[#555] font-semibold uppercase tracking-wide mb-1">Plan</p>
             <p className="text-[#0f3d52] font-bold uppercase">{perfil?.plan || 'gratis'}</p>
           </div>
-
           {editando ? (
             <div className="flex flex-col gap-3">
-              <input
-                type="text"
-                placeholder="Nombre"
-                value={nombre}
-                onChange={e => setNombre(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-[#e8e8e8] focus:border-[#0f3d52] outline-none text-[#0f3d52] font-medium"
-              />
-              <input
-                type="text"
-                placeholder="Empresa"
-                value={empresa}
-                onChange={e => setEmpresa(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-[#e8e8e8] focus:border-[#0f3d52] outline-none text-[#0f3d52] font-medium"
-              />
+              <input type="text" placeholder="Nombre" value={nombre} onChange={e => setNombre(e.target.value)} className="w-full px-4 py-3 rounded-xl border-2 border-[#e8e8e8] focus:border-[#0f3d52] outline-none text-[#0f3d52] font-medium" />
+              <input type="text" placeholder="Empresa" value={empresa} onChange={e => setEmpresa(e.target.value)} className="w-full px-4 py-3 rounded-xl border-2 border-[#e8e8e8] focus:border-[#0f3d52] outline-none text-[#0f3d52] font-medium" />
               <div className="flex gap-3">
-                <button onClick={handleGuardar} disabled={loading} className="flex-1 py-3 bg-[#0f3d52] text-white font-bold text-sm rounded-xl hover:bg-[#1a5c78] transition-all">
-                  {loading ? 'Guardando...' : 'Guardar'}
-                </button>
-                <button onClick={() => setEditando(false)} className="flex-1 py-3 border-2 border-[#e8e8e8] text-[#555] font-bold text-sm rounded-xl hover:border-[#0f3d52] transition-all">
-                  Cancelar
-                </button>
+                <button onClick={handleGuardar} disabled={loading} className="flex-1 py-3 bg-[#0f3d52] text-white font-bold text-sm rounded-xl hover:bg-[#1a5c78] transition-all">{loading ? 'Guardando...' : 'Guardar'}</button>
+                <button onClick={() => setEditando(false)} className="flex-1 py-3 border-2 border-[#e8e8e8] text-[#555] font-bold text-sm rounded-xl hover:border-[#0f3d52] transition-all">Cancelar</button>
               </div>
             </div>
           ) : (
@@ -93,13 +74,8 @@ function ModalCuenta({ onClose }) {
               </div>
             </div>
           )}
-
           {mensaje && <p className="text-[#4CAF50] text-sm font-semibold text-center">{mensaje}</p>}
-
-          <button
-            onClick={handleCerrarSesion}
-            className="w-full py-3 border-2 border-red-200 text-red-500 font-bold text-sm rounded-xl hover:bg-red-50 transition-all mt-2"
-          >
+          <button onClick={handleCerrarSesion} className="w-full py-3 border-2 border-red-200 text-red-500 font-bold text-sm rounded-xl hover:bg-red-50 transition-all mt-2">
             Cerrar sesión
           </button>
         </div>
@@ -108,7 +84,7 @@ function ModalCuenta({ onClose }) {
   )
 }
 
-export default function DashboardHeader() {
+export default function DashboardHeader({ accionDerecha }) {
   const [modalAbierto, setModalAbierto] = useState(false)
 
   return (
@@ -121,10 +97,7 @@ export default function DashboardHeader() {
         <nav className="flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
           <Link href="/dashboard" className="text-white/60 text-xs font-semibold uppercase tracking-widest hover:text-[#F5B800] transition-colors">Mis obras</Link>
           <Link href="/dashboard/clientes" className="text-white/60 text-xs font-semibold uppercase tracking-widest hover:text-[#F5B800] transition-colors">Clientes</Link>
-          <button
-            onClick={() => setModalAbierto(true)}
-            className="flex items-center gap-2 text-white/60 text-xs font-semibold uppercase tracking-widest hover:text-[#F5B800] transition-colors"
-          >
+          <button onClick={() => setModalAbierto(true)} className="flex items-center gap-2 text-white/60 text-xs font-semibold uppercase tracking-widest hover:text-[#F5B800] transition-colors">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4CAF50] opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4CAF50]"></span>
@@ -133,9 +106,7 @@ export default function DashboardHeader() {
           </button>
         </nav>
         <div className="flex items-center gap-3">
-          <Link href="/dashboard/nueva-obra" className="px-5 py-2.5 bg-[#4CAF50] text-white font-bold text-sm uppercase tracking-wider rounded hover:bg-[#388e3c] transition-all">
-            + Nueva obra
-          </Link>
+          {accionDerecha}
         </div>
       </header>
     </>
