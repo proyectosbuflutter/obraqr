@@ -35,42 +35,40 @@ export default function Dashboard() {
     cargar()
   }, [user, loading])
 
-  if (loading || !perfil) return <div className="min-h-screen bg-[#f5f0e8] flex items-center justify-center"><p className="text-[#0f3d52] font-bold">Cargando...</p></div>
+  if (loading || !perfil) return (
+    <div className="min-h-screen bg-[#f5f0e8] flex items-center justify-center">
+      <p className="text-[#0f3d52] font-bold">Cargando...</p>
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-[#f5f0e8]">
-      <aside className="fixed top-0 left-0 h-full w-64 bg-[#0f3d52] flex flex-col z-50">
-        <div className="px-6 py-8 border-b border-white/10">
-          <span className="font-black text-white text-xl tracking-tight">ObraQR</span>
-          <p className="text-white/40 text-xs mt-1">{perfil?.nombre || user.email}</p>
-          <span className="inline-block mt-2 px-2 py-0.5 bg-[#F5B800] text-[#0f3d52] text-xs font-bold rounded uppercase tracking-wide">{perfil?.plan || 'gratis'}</span>
-        </div>
-        <nav className="flex-1 px-4 py-6 flex flex-col gap-1">
-          <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/10 text-white text-sm font-medium">
-            📋 Mis obras
-          </Link>
-          <Link href="/dashboard/clientes" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-white text-sm font-medium transition-all">
-            👥 Clientes
-          </Link>
-          <Link href="/dashboard/cuenta" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-white text-sm font-medium transition-all">
-            ⚙️ Cuenta
-          </Link>
+
+      {/* HEADER */}
+      <header className="fixed top-0 left-0 right-0 h-[72px] bg-[#0f3d52] flex items-center justify-between px-8 z-50">
+        <Link href="/dashboard">
+          <img src="/obraqr.png" alt="ObraQR" className="h-12 w-auto" />
+        </Link>
+        <nav className="flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+          <Link href="/dashboard" className="text-white text-xs font-semibold uppercase tracking-widest hover:text-[#F5B800] transition-colors">Mis obras</Link>
+          <Link href="/dashboard/clientes" className="text-white/60 text-xs font-semibold uppercase tracking-widest hover:text-[#F5B800] transition-colors">Clientes</Link>
+          <Link href="/dashboard/cuenta" className="text-white/60 text-xs font-semibold uppercase tracking-widest hover:text-[#F5B800] transition-colors">Cuenta</Link>
           {perfil?.plan === 'business' && (
-            <Link href="/dashboard/equipo" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:bg-white/10 hover:text-white text-sm font-medium transition-all">
-              🏢 Equipo
-            </Link>
+            <Link href="/dashboard/equipo" className="text-white/60 text-xs font-semibold uppercase tracking-widest hover:text-[#F5B800] transition-colors">Equipo</Link>
           )}
         </nav>
-        <div className="px-4 py-6 border-t border-white/10">
-          <Link href="/dashboard/nueva-obra" className="block w-full text-center py-3 bg-[#F5B800] text-[#0f3d52] font-bold text-sm rounded-lg hover:bg-[#d9a200] transition-all">
+        <div className="flex items-center gap-4">
+          <span className="px-2 py-0.5 bg-[#F5B800] text-[#0f3d52] text-xs font-bold rounded uppercase tracking-wide">{perfil?.plan || 'gratis'}</span>
+          <Link href="/dashboard/nueva-obra" className="px-5 py-2.5 bg-[#4CAF50] text-white font-bold text-xs uppercase tracking-wider rounded hover:bg-[#388e3c] transition-all">
             + Nueva obra
           </Link>
         </div>
-      </aside>
+      </header>
 
-      <main className="ml-64 p-8">
+      {/* MAIN */}
+      <main className="pt-[72px] p-8">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
+          <div className="mb-8 pt-4">
             <h1 className="font-black text-3xl text-[#0f3d52] tracking-tight">Mis obras</h1>
             <p className="text-[#555] mt-1">{obras.length} obra{obras.length !== 1 ? 's' : ''} activa{obras.length !== 1 ? 's' : ''}</p>
           </div>
