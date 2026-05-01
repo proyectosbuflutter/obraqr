@@ -42,7 +42,7 @@ export default function Dashboard() {
   )
 
   return (
-    <div className="min-h-screen bg-[#f5f0e8]">
+    <div className="min-h-screen bg-[#F5B800]">
 
       {/* HEADER */}
       <header className="fixed top-0 left-0 right-0 h-[72px] bg-[#0f3d52] flex items-center justify-between px-8 z-50">
@@ -57,9 +57,12 @@ export default function Dashboard() {
             <Link href="/dashboard/equipo" className="text-white/60 text-xs font-semibold uppercase tracking-widest hover:text-[#F5B800] transition-colors">Equipo</Link>
           )}
         </nav>
-        <div className="flex items-center gap-4">
-          <span className="px-2 py-0.5 bg-[#F5B800] text-[#0f3d52] text-xs font-bold rounded uppercase tracking-wide">{perfil?.plan || 'gratis'}</span>
-          <Link href="/dashboard/nueva-obra" className="px-5 py-2.5 bg-[#4CAF50] text-white font-bold text-xs uppercase tracking-wider rounded hover:bg-[#388e3c] transition-all">
+        <div className="flex items-center gap-3">
+          <span className="px-4 py-2 bg-[#F5B800] text-[#0f3d52] text-sm font-bold rounded uppercase tracking-wide">{perfil?.plan || 'gratis'}</span>
+          <Link href="/dashboard/cuenta" className="px-4 py-2 border-2 border-white/40 text-white text-sm font-bold rounded uppercase tracking-wide hover:border-white transition-all">
+            Mejora tu plan
+          </Link>
+          <Link href="/dashboard/nueva-obra" className="px-5 py-2.5 bg-[#4CAF50] text-white font-bold text-sm uppercase tracking-wider rounded hover:bg-[#388e3c] transition-all">
             + Nueva obra
           </Link>
         </div>
