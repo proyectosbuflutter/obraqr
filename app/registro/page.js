@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
 export default function Registro() {
@@ -17,6 +17,8 @@ export default function Registro() {
     setLoading(true)
     setError('')
 
+    const supabase = createClient()
+
     const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -31,7 +33,6 @@ export default function Registro() {
       return
     }
 
-    // Crear perfil en tabla users
     await supabase.from('users').insert({
       id: data.user.id,
       email,
