@@ -22,7 +22,7 @@ export default function DetalleObra() {
       if (!obraData) { router.push('/dashboard'); return }
       setObra(obraData)
       const { data: updatesData } = await supabase
-        .from('updates').select('*, update_images(*)')
+        .from('updates').select('*, update_images(*), users(nombre)')
         .eq('obra_id', id).order('created_at', { ascending: false })
       setUpdates(updatesData || [])
       setLoading(false)
@@ -110,7 +110,10 @@ export default function DetalleObra() {
           <div className="flex flex-col gap-4">
             {updates.map(update => (
               <div key={update.id} className="bg-white rounded-2xl p-6 border border-[#e8e8e8]">
-                <p className="text-xs text-[#555] mb-3 font-semibold">{new Date(update.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                <div className="flex items-center gap-3 mb-3">
+                  <p className="text-xs text-[#555] font-semibold">{new Date(update.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                  {update.users?.nombre && <span className="text-xs text-[#0f3d52] font-bold">· {update.users.nombre}</span>}
+                </div>
                 <div className="flex gap-4 items-start">
                   {update.update_images?.length > 0 && (
                     <div className="flex gap-2 flex-shrink-0">
