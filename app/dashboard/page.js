@@ -1,42 +1,44 @@
-import { redirect } from 'next/navigation'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useAuth } from '@/app/context/AuthContext'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-export default async function Dashboard() {
-  const cookieStore = await cookies()
+export default function Dashboard() {
+  const { user, supabase, loading } = useAuth()
+  const router = useRouter()
+  const [obras, setObras] = useState([])
+  const [perfil, setPerfil] = useState(null)
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        }
-      }
+  useEffect(() => {
+    if (loading) return
+    if (!user) {
+      router.push('/login')
+      return
     }
-  )
+    async function cargar() {
+      const { data: obrasData } = await supabase
+        .from('obras')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+      setObras(obrasData || [])
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+      const { data: perfilData } = await supabase
+        .from('users')
+        .select('nombre, plan')
+        .eq('id', user.id)
+        .single()
+      setPerfil(perfilData)
+    }
+    cargar()
+  }, [user, loading])
 
-  const { data: obras } = await supabase
-    .from('obras')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-
-  const { data: perfil } = await supabase
-    .from('users')
-    .select('nombre, plan')
-    .eq('id', user.id)
-    .single()
+  if (loading || !perfil) return <div className="min-h-screen bg-[#f5f0e8] flex items-center justify-center"><p className="text-[#0f3d52] font-bold">Cargando...</p></div>
 
   return (
     <div className="min-h-screen bg-[#f5f0e8]">
-
-      {/* SIDEBAR */}
       <aside className="fixed top-0 left-0 h-full w-64 bg-[#0f3d52] flex flex-col z-50">
         <div className="px-6 py-8 border-b border-white/10">
           <span className="font-black text-white text-xl tracking-tight">ObraQR</span>
@@ -66,15 +68,14 @@ export default async function Dashboard() {
         </div>
       </aside>
 
-      {/* MAIN */}
       <main className="ml-64 p-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="font-black text-3xl text-[#0f3d52] tracking-tight">Mis obras</h1>
-            <p className="text-[#555] mt-1">{obras?.length || 0} obra{obras?.length !== 1 ? 's' : ''} activa{obras?.length !== 1 ? 's' : ''}</p>
+            <p className="text-[#555] mt-1">{obras.length} obra{obras.length !== 1 ? 's' : ''} activa{obras.length !== 1 ? 's' : ''}</p>
           </div>
 
-          {obras?.length === 0 && (
+          {obras.length === 0 && (
             <div className="bg-white rounded-2xl p-12 text-center border border-[#e8e8e8]">
               <p className="text-4xl mb-4">🏗️</p>
               <h2 className="font-black text-xl text-[#0f3d52] mb-2">No tienes obras todavía</h2>
@@ -86,7 +87,7 @@ export default async function Dashboard() {
           )}
 
           <div className="grid gap-4">
-            {obras?.map(obra => (
+            {obras.map(obra => (
               <Link key={obra.id} href={`/dashboard/obra/${obra.id}`}>
                 <div className="bg-white rounded-2xl p-6 border border-[#e8e8e8] hover:border-[#0f3d52] hover:shadow-lg transition-all cursor-pointer">
                   <div className="flex items-start justify-between">
