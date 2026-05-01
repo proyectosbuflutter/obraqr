@@ -29,6 +29,7 @@ export default function Login() {
       return
     }
 
+    await new Promise(resolve => setTimeout(resolve, 500))
     router.push('/dashboard')
     router.refresh()
   }
