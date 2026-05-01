@@ -33,6 +33,10 @@ export default function NuevaObra() {
       return
     }
 
+    console.log('user id:', user.id)
+
+    console.log('user id:', user.id)
+
     const slug = generarSlug(nombre)
 
     const { data, error: dbError } = await supabase
