@@ -10,6 +10,8 @@ export default function Dashboard() {
   const router = useRouter()
   const [obras, setObras] = useState([])
   const [perfil, setPerfil] = useState(null)
+  const [busqueda, setBusqueda] = useState('')
+  const [updateCounts, setUpdateCounts] = useState({})
 
   useEffect(() => {
     if (loading) return
@@ -31,12 +33,35 @@ export default function Dashboard() {
         .eq('id', user.id)
         .single()
       setPerfil(perfilData)
+
+      if (obrasData?.length > 0) {
+        const { data: updatesData } = await supabase
+          .from('updates')
+          .select('obra_id, created_at')
+          .in('obra_id', obrasData.map(o => o.id))
+          .order('created_at', { ascending: false })
+
+        const counts = {}
+        updatesData?.forEach(u => {
+          if (!counts[u.obra_id]) counts[u.obra_id] = { count: 0, last: u.created_at }
+          counts[u.obra_id].count++
+        })
+        setUpdateCounts(counts)
+      }
     }
     cargar()
   }, [user, loading])
 
+  const obrasFiltradas = obras.filter(o =>
+    o.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+    (o.cliente_nombre && o.cliente_nombre.toLowerCase().includes(busqueda.toLowerCase()))
+  )
+
+  const enCurso = obras.filter(o => o.estado === 'en_curso').length
+  const terminadas = obras.filter(o => o.estado === 'terminada').length
+
   if (loading || !perfil) return (
-    <div className="min-h-screen bg-[#f5f0e8] flex items-center justify-center">
+    <div className="min-h-screen bg-[#F5B800] flex items-center justify-center">
       <p className="text-[#0f3d52] font-bold">Cargando...</p>
     </div>
   )
@@ -71,11 +96,35 @@ export default function Dashboard() {
       {/* MAIN */}
       <main className="pt-[72px] p-8">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8 pt-4">
-            <h1 className="font-black text-3xl text-[#0f3d52] tracking-tight">Mis obras</h1>
-            <p className="text-[#555] mt-1">{obras.length} obra{obras.length !== 1 ? 's' : ''} activa{obras.length !== 1 ? 's' : ''}</p>
+
+          {/* STATS */}
+          <div className="grid grid-cols-3 gap-4 mb-8 pt-4">
+            <div className="bg-[#0f3d52] rounded-2xl p-6">
+              <p className="text-white/50 text-xs uppercase tracking-widest mb-1">Total obras</p>
+              <p className="text-white font-black text-4xl">{obras.length}</p>
+            </div>
+            <div className="bg-[#0f3d52] rounded-2xl p-6">
+              <p className="text-white/50 text-xs uppercase tracking-widest mb-1">En curso</p>
+              <p className="text-[#4CAF50] font-black text-4xl">{enCurso}</p>
+            </div>
+            <div className="bg-[#0f3d52] rounded-2xl p-6">
+              <p className="text-white/50 text-xs uppercase tracking-widest mb-1">Terminadas</p>
+              <p className="text-white font-black text-4xl">{terminadas}</p>
+            </div>
           </div>
 
+          {/* BUSCADOR */}
+          <div className="mb-6">
+            <input
+              type="text"
+              placeholder="Buscar obra o cliente..."
+              value={busqueda}
+              onChange={e => setBusqueda(e.target.value)}
+              className="w-full px-5 py-3.5 rounded-xl bg-white border-2 border-transparent focus:border-[#0f3d52] outline-none text-[#0f3d52] font-medium placeholder:text-gray-400"
+            />
+          </div>
+
+          {/* OBRAS */}
           {obras.length === 0 && (
             <div className="bg-white rounded-2xl p-12 text-center border border-[#e8e8e8]">
               <p className="text-4xl mb-4">🏗️</p>
@@ -88,9 +137,9 @@ export default function Dashboard() {
           )}
 
           <div className="grid gap-4">
-            {obras.map(obra => (
+            {obrasFiltradas.map(obra => (
               <Link key={obra.id} href={`/dashboard/obra/${obra.id}`}>
-                <div className="bg-white rounded-2xl p-6 border border-[#e8e8e8] hover:border-[#0f3d52] hover:shadow-lg transition-all cursor-pointer">
+                <div className="bg-white rounded-2xl p-6 border-2 border-transparent hover:border-[#0f3d52] hover:shadow-lg transition-all cursor-pointer">
                   <div className="flex items-start justify-between">
                     <div>
                       <h2 className="font-black text-lg text-[#0f3d52] mb-1">{obra.nombre}</h2>
@@ -104,6 +153,16 @@ export default function Dashboard() {
                         {obra.estado === 'en_curso' ? 'En curso' : obra.estado}
                       </span>
                       <span className="text-xs text-[#555]">{new Date(obra.created_at).toLocaleDateString('es-ES')}</span>
+                      {updateCounts[obra.id] && (
+                        <span className="text-xs text-[#0f3d52] font-semibold">
+                          {updateCounts[obra.id].count} actualización{updateCounts[obra.id].count !== 1 ? 'es' : ''}
+                        </span>
+                      )}
+                      {updateCounts[obra.id] && (
+                        <span className="text-xs text-[#555]">
+                          Última: {new Date(updateCounts[obra.id].last).toLocaleDateString('es-ES')}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
